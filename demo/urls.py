@@ -4,5 +4,6 @@ from . import views
 
 
 urlpatterns = [
-    url('', views.IndexView.as_view(), name="index")
+    url('', views.home, name="home"),
+    url('bot/', views.IndexView.as_view(), name="index")
 ]

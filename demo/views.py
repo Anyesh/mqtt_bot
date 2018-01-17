@@ -24,6 +24,9 @@ password = 'vake'
 
 _id = 0
 
+def home(request):
+    return HttpResponse('Hello')
+
 def on_connect(client, userdata, flags, rc):
   print("Connected with result code "+str(rc))
   client.subscribe("report")
