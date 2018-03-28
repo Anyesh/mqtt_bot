@@ -19,7 +19,7 @@ def response_message(_id, _text):
 def get_started(post_message_url, _id, user_details):
 
     _text = 'Hello ' + user_details['first_name'] + \
-        '! ' + 'welcome to Autism Bot'
+        '! ' + 'welcome to MQTT Bot'
     response_msg = response_message(_id, _text)
 
     status = requests.post(

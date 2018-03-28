@@ -27,14 +27,16 @@ def _broker(client_id, sub, state):
     print('Subscribed to:', sub)
     print('state:', state)
 
-    # client.on_message = on_message
+    client.on_message = on_message
     client.username_pw_set(username, password)
     client.connect(broker, port)
     client.loop_start()
 
     client.subscribe(sub)
+    print('subscribed')
 
     client.publish(sub, state)
+    print('published')
 
     client.disconnect()
     client.loop_stop()

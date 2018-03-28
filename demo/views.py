@@ -31,9 +31,9 @@ def home(request):
 
 def on_connect(client, userdata, flags, rc):
   print("Connected with result code "+str(rc))
-  client.subscribe("report")
 
 def on_message(client, userdata, msg):
+    print('message')
     _text = str(msg.payload.decode())
     response_msg = json.dumps({
         "recipient": {
@@ -52,7 +52,7 @@ def listner(client_id, username, password, broker, port):
     client.username_pw_set(username, password)
 
     client.connect(broker, port, 60)
-    client.on_connect = on_connect
+    # client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
 
@@ -95,7 +95,8 @@ class IndexView(View):
             elif payload == "BULB_ON":
                 _broker(str(_id), 'house/bulb1', 'on')
                 _text = 'Server: bulb turned on'
-                listner(_id, username, password, broker, port)
+                print(_text)
+                # listner(_id, username, password, broker, port)
 
                 response_msg = json.dumps({
                     "recipient": {
@@ -105,16 +106,17 @@ class IndexView(View):
                         "text": _text
                     }
                 })
-                # status = requests.post(
-                #     post_message_url,
-                #     headers={"Content-Type": "application/json"},
-                #     data=response_msg)
+                status = requests.post(
+                    post_message_url,
+                    headers={"Content-Type": "application/json"},
+                    data=response_msg)
                 return HttpResponse()
 
             elif payload == 'BULB_OFF':
                 _broker(_id, 'house/bulb1', 'off')
                 _text = 'Server: bulb turned off'
-                listner(_id, username, password, broker, port)
+                print(_text)
+                # listner(_id, username, password, broker, port)
 
                 response_msg = json.dumps({
                     "recipient": {
@@ -124,10 +126,10 @@ class IndexView(View):
                         "text": _text
                     }
                 })
-                # status = requests.post(
-                #     post_message_url,
-                #     headers={"Content-Type": "application/json"},
-                #     data=response_msg)
+                status = requests.post(
+                    post_message_url,
+                    headers={"Content-Type": "application/json"},
+                    data=response_msg)
                 return HttpResponse()
 
             error_response(post_message_url, _id)
