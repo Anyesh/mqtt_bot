@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 import paho.mqtt.client as mqtt
 from .services import _broker
 
-PAGE_ACCESS_TOKEN = "EAACb90wmKqkBAMXZCZAqwZAVCYEzAB8r78j1OXtf1zhRtapfkhGczwh50VZCkKUT8PBXvKHDpWrnd9Hv4I2ERKOCckCunhrymHpNpZBIzCLmF7Q8jpQmZBr492Uki3idHWOphqQgJiQ0OeVWX9fKKhuVpKIbps1pW7RP4gCxZCqFQZDZD"
+PAGE_ACCESS_TOKEN = "EAActBRWlieYBAJlgvruU0O26jTGvbtxYyXf9HO3RMrdZAERMMnWYvBVjlc0hTTm9hEk2APVxr98K7mg0scNBxooZCHFtc81wNdNAFRvJU3LGgnAEAJSWbx2d3ZAPQLuPenWZCUZAIcITqZAJKjeQb5KCqFjT3C1fAJFCzEpigZAH4oiWNOEqx3c"
 TOKEN = 'cruz_token'
 
 post_message_url = (
@@ -35,7 +35,7 @@ def on_message(client, userdata, msg):
     _text = str(msg.payload.decode())
     response_msg = json.dumps({
         "recipient": {
-            "id": 1791221587568171
+            "id": _id
         },
         "message": {
             "text": _text
@@ -71,6 +71,8 @@ class IndexView(View):
          # Converts the text payload into a python dictionary
         incoming_message = json.loads(self.request.body.decode('utf-8'))
 
+        message_data = incoming_message['entry'][0]['messaging'][0]
+
         global _id
         _id = incoming_message['entry'][0]['messaging'][0]['sender']['id']
         user_details_url = "https://graph.facebook.com/v2.6/%s" % _id
@@ -81,26 +83,14 @@ class IndexView(View):
         user_details = requests.get(user_details_url,
                                     user_details_params).json()
 
-        if "postback" in incoming_message['entry'][0]['messaging'][0]:
-            if incoming_message['entry'][0]['messaging'][0]['postback'][
-                    'payload'] == "GET_STARTED":
+        if "postback" in message_data:
+            payload = incoming_message['entry'][0]['messaging'][0]['postback']['payload']
+            if payload == "GET_STARTED":
+                get_started(post_message_url, _id, user_details)
 
-                _text = 'Hello ' + user_details['first_name'] + '!! ' + 'welcome to mqtt_test!'
-                response_msg = json.dumps({
-                    "recipient": {
-                        "id": _id
-                    },
-                    "message": {
-                        "text": _text
-                    }
-                })
-                status = requests.post(
-                    post_message_url,
-                    headers={"Content-Type": "application/json"},
-                    data=response_msg)
                 return HttpResponse()
 
-            if incoming_message['entry'][0]['messaging'][0]['postback']['payload'] == 'BULB_ON':
+            elif payload == "BULB_ON":
                 _broker(str(_id), 'house/bulb1', 'on')
                 _text = 'Server: bulb turned on'
                 listner(_id, username, password, broker, port)
@@ -119,7 +109,7 @@ class IndexView(View):
                 #     data=response_msg)
                 return HttpResponse()
 
-            if incoming_message['entry'][0]['messaging'][0]['postback']['payload'] == 'BULB_OFF':
+            elif payload == 'BULB_OFF':
                 _broker(_id, 'house/bulb1', 'off')
                 _text = 'Server: bulb turned off'
                 listner(_id, username, password, broker, port)
@@ -137,3 +127,19 @@ class IndexView(View):
                 #     headers={"Content-Type": "application/json"},
                 #     data=response_msg)
                 return HttpResponse()
+
+            error_response(post_message_url, _id)
+            return HttpResponse()
+
+        elif 'message' in message_data:
+            msg = incoming_message['entry'][0]['messaging'][0]['message']
+
+            nlp_replies(incoming_message, msg, _id,
+                        user_details, post_message_url)
+            return HttpResponse()
+
+        else:
+            error_response(post_message_url, _id)
+            return HttpResponse()
+
+
