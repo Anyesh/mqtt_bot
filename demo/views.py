@@ -8,6 +8,8 @@ from pprint import pprint
 from django.utils.decorators import method_decorator
 import paho.mqtt.client as mqtt
 from .services import _broker
+from .utils import get_started, message_reply, error_response, nlp_replies
+
 
 PAGE_ACCESS_TOKEN = "EAActBRWlieYBAJlgvruU0O26jTGvbtxYyXf9HO3RMrdZAERMMnWYvBVjlc0hTTm9hEk2APVxr98K7mg0scNBxooZCHFtc81wNdNAFRvJU3LGgnAEAJSWbx2d3ZAPQLuPenWZCUZAIcITqZAJKjeQb5KCqFjT3C1fAJFCzEpigZAH4oiWNOEqx3c"
 TOKEN = 'cruz_token'
