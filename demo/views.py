@@ -14,9 +14,8 @@ from .utils import get_started, message_reply, error_response, nlp_replies
 PAGE_ACCESS_TOKEN = "EAActBRWlieYBAJlgvruU0O26jTGvbtxYyXf9HO3RMrdZAERMMnWYvBVjlc0hTTm9hEk2APVxr98K7mg0scNBxooZCHFtc81wNdNAFRvJU3LGgnAEAJSWbx2d3ZAPQLuPenWZCUZAIcITqZAJKjeQb5KCqFjT3C1fAJFCzEpigZAH4oiWNOEqx3c"
 TOKEN = 'cruz_token'
 
-post_message_url = (
-    'https://graph.facebook.com/v2.6/me/messages?access_token={}'.format(
-        PAGE_ACCESS_TOKEN))
+post_message_url = f'https://graph.facebook.com/v2.6/me/messages?access_token={PAGE_ACCESS_TOKEN}'
+
 
 broker = 'vps.datalogy.asia'
 port = 1883
@@ -30,7 +29,7 @@ def home(request):
     return HttpResponse('Hello')
 
 def on_connect(client, userdata, flags, rc):
-  print("Connected with result code "+str(rc))
+    print(f"Connected with result code {str(rc)}")
 
 def on_message(client, userdata, msg):
     print('message')
@@ -77,7 +76,7 @@ class IndexView(View):
 
         global _id
         _id = incoming_message['entry'][0]['messaging'][0]['sender']['id']
-        user_details_url = "https://graph.facebook.com/v2.6/%s" % _id
+        user_details_url = f"https://graph.facebook.com/v2.6/{_id}"
         user_details_params = {
             'fields': 'first_name,last_name,profile_pic',
             'access_token': PAGE_ACCESS_TOKEN
@@ -133,17 +132,14 @@ class IndexView(View):
                 return HttpResponse()
 
             error_response(post_message_url, _id)
-            return HttpResponse()
-
         elif 'message' in message_data:
             msg = incoming_message['entry'][0]['messaging'][0]['message']
 
             nlp_replies(incoming_message, msg, _id,
                         user_details, post_message_url)
-            return HttpResponse()
-
         else:
             error_response(post_message_url, _id)
-            return HttpResponse()
+
+        return HttpResponse()
 
 
