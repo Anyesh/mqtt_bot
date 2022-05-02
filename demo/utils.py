@@ -4,16 +4,7 @@ import random
 
 
 def response_message(_id, _text):
-    res_msg = json.dumps({
-        "recipient": {
-            "id": _id
-        },
-        "message": {
-            "text": _text
-        }
-    })
-
-    return res_msg
+    return json.dumps({"recipient": {"id": _id}, "message": {"text": _text}})
 
 
 def get_started(post_message_url, _id, user_details):
